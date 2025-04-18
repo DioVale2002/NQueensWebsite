@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
-  <title>N-Queens Problem Text Simulator</title>
+  <title>N-Queens Problem Simulation</title>
 </head>
 <body>
   <div class="header">
@@ -118,7 +118,8 @@
         prevButton.style.display = 'none';
         nextButton.style.display = 'none';
         solutionCurrentNumberDiv.style.display = 'none';
-        solutionCountDiv.textContent = "No solutions found!";
+        solutionCountDiv.style.display = 'block';
+        document.getElementById('solution-count').innerText  = "No solutions found!";
         return; 
       }
 
