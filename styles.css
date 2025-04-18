@@ -29,6 +29,7 @@
 
     .controls button{
       background-color: #BA9C9C;
+      font-size: 18px;
       padding: 8px 12px;
       margin: 0 5px;
       border-radius: 5px;
@@ -36,16 +37,18 @@
 
     .controls button:hover{
       cursor: pointer;
-      background-color: #3f2424;
+      background-color: #8b6363;
     }
     
-    input{
+    .controls input{
+      font-size: 18px;
       padding: 8px 12px;
-      margin: 0 5px;
+      margin: 2px 5px;
     }
 
     .solution-count-div {
       margin: 0 auto;
+      font-size: 15px;
       width: 600px;
       height: 60px;
       display: none;
