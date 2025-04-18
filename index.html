@@ -7,7 +7,9 @@
   <title>N-Queens Problem Text Simulator</title>
 </head>
 <body>
-  <h1>N-Queens Problem Text Simulator</h1>
+  <div class="header">
+    <h1>N-Queens Problem Text Simulator</h1>
+  </div>
   
   <div class="controls">
     <label for="boardSize">Board Size (N):</label>
@@ -15,19 +17,25 @@
     <button id="solveButton">Solve</button>
   </div>
   
-  <div id="output">Solution will appear here...</div>
+  <div class="solution-count-div" id="solution-count-div">
+    <h1 class="solution-count" id="solution-count"></h1>
+  </div>
+  <div class="board" id="chessboard"></div>
+  <div class="solution-number-div" id="solution-number-div">
+    <h1 class="solution-number" id="solution-number"></h1>
+    <button class="btns" id="prevSolution"><img src="prev_button.png" alt="prevButton" class="btnImg"></button>
+    <button class="btns" id="nextSolution"><img src="next_button.png" alt="nextButton" class="btnImg"></button>
+  </div>
   
   <div class="explanation">
-    <h3>About the N-Queens Problem:</h3>
+    <h2>About the N-Queens Problem:</h2>
     <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means no two queens can share the same row, column, or diagonal.</p>
-    <p>In the output:</p>
-    <ul>
-      <li>'Q' represents a queen</li>
-      <li>'.' represents an empty cell</li>
-    </ul>
   </div>
   
   <script>
+    let solutions = [];
+    let solutionCount;
+
     document.getElementById('solveButton').addEventListener('click', () => {
       const n = parseInt(document.getElementById('boardSize').value);
       if (n < 1 || n > 12) {
@@ -35,12 +43,27 @@
         return;
       }
       
-      const solutions = solveNQueens(n);
-      displaySolutions(solutions);
+      solutions = solveNQueens(n);
+      solutionCount = 0;
+      displayBoard(solutionCount);
+    });
+
+    document.getElementById('prevSolution').addEventListener('click', () => {
+      if (solutions.length > 0 || (solutionCount + 1) >= solutions.length) {
+        solutionCount--;
+        displayBoard(solutionCount);
+      }
+    });
+    
+    document.getElementById('nextSolution').addEventListener('click', () => {
+      if (solutions.length > 0 || (solutionCount + 1) < solutions.length) {
+        solutionCount++;
+        displayBoard(solutionCount);
+      }
     });
     
     function solveNQueens(n) {
-      const solutions = [];
+      solutions = [];
       const board = Array(n).fill().map(() => Array(n).fill('.'));
       
       function isSafe(row, col) {
@@ -82,36 +105,76 @@
       backtrack(0);
       return solutions;
     }
-    
-    function displaySolutions(solutions) {
-      const outputDiv = document.getElementById('output');
-      
-      if (solutions.length === 0) {
-        outputDiv.textContent = "No solutions found!";
-        return;
+
+    function displayBoard(solutionCount) {
+      const boardDiv = document.getElementById('chessboard');
+      const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
+      const prevButton = document.getElementById('prevSolution');
+      const nextButton = document.getElementById('nextSolution');
+      const solutionCountDiv = document.getElementById('solution-count-div');
+
+      if(solutions == null || solutions.length === 0) {
+        boardDiv.style.display = 'none';
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        solutionCurrentNumberDiv.style.display = 'none';
+        solutionCountDiv.textContent = "No solutions found!";
+        return; 
+      }
+
+      if(solutions.length === 1) {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+      } 
+
+      solutionCountDiv.style.display = 'block';
+      document.getElementById('solution-count').innerText = `${solutions.length} Solution${solutions.length > 1 ? 's' : ''} Found!`;
+      boardDiv.style.display = 'grid';
+      solutionCurrentNumberDiv.style.display = 'flex';
+      prevButton.style.visibility = 'visible';
+      prevButton.style.display = 'block';
+      nextButton.style.visibility = 'visible';
+      nextButton.style.display = 'block';
+
+      if((solutionCount+1) === solutions.length){ //hide next button
+        nextButton.style.visibility = 'hidden';
+      }
+
+      if(solutionCount === 0) { //hide prev button
+        prevButton.style.visibility = 'hidden';
       }
       
-      let output = `Found ${solutions.length} solution${solutions.length > 1 ? 's' : ''}:\n\n`;
-      
-      // Display first solution fully
-      output += "Solution 1:\n";
-      for (let i = 0; i < solutions[0].length; i++) {
-        output += solutions[0][i] + "\n";
-      }
-      
-      // If there are more solutions, show a sample
-      if (solutions.length > 1) {
-        output += "\nSolution 2:\n";
-        for (let i = 0; i < solutions[1].length; i++) {
-          output += solutions[1][i] + "\n";
+      const N = solutions[0].length;
+
+      document.getElementById('solution-number').innerText = `Solution ${solutionCount + 1}`;
+
+      boardDiv.innerHTML = ''; // Clear previous board
+      boardDiv.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+      boardDiv.style.gridTemplateRows = `repeat(${N}, 1fr)`;
+
+      for (let row = 0; row < N; row++) {
+        for (let col = 0; col < N; col++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+
+          if ((row + col) % 2 === 0) {
+            cell.classList.add('white');
+          } else {
+            cell.classList.add('light-brown');
+          }
+
+          // Add queen if 'Q'
+          if (solutions[solutionCount][row][col] === 'Q') {
+            const queen = document.createElement('img');
+            queen.src = 'queen_Image.png';
+            queen.alt = 'queen';
+            queen.classList.add('queen');
+            cell.appendChild(queen);
+          }
+
+          boardDiv.appendChild(cell);
         }
-        
-        if (solutions.length > 2) {
-          output += `\n...and ${solutions.length - 2} more solution${solutions.length > 3 ? 's' : ''}.`;
-        }
       }
-      
-      outputDiv.textContent = output;
     }
   </script>
 </body>
