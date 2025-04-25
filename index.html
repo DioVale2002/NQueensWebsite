@@ -75,17 +75,21 @@
          for (let row = 0; row < n; row++) {
            if (isSafe(row, col)) {
              board[row][col] = 'Q';
+             traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})`);
              backtrack(col + 1);
              board[row][col] = '.'; // Backtrack
+             traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})`);
+           } else {
+            traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})`);
            }
          }
        }
        
        backtrack(0);
-       return solutions;
+       return { solutions, traceLog };
      }
      
-     function displaySolutions(solutions) {
+     function displaySolutions(solutions, traceLog) {
        const outputDiv = document.getElementById('output');
        
        if (solutions.length === 0) {
