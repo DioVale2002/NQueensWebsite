@@ -42,7 +42,8 @@
      function solveNQueens(n) {
        const solutions = [];
        const board = Array(n).fill().map(() => Array(n).fill('.'));
-       
+       let traceLog = [];
+
        function isSafe(row, col) {
          // Check row
          for (let i = 0; i < col; i++) {
@@ -67,6 +68,7 @@
            // Found a solution, add it
            const solution = board.map(row => row.join(''));
            solutions.push(solution);
+           traceLog.push(`${'  '.repeat(depth)}✔️ solution found:\n${solution.join('\n')}\n`);
            return;
          }
          
