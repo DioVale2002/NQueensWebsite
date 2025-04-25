@@ -1,124 +1,132 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="stylesheet" href="styles.css">
-   <title>N-Queens Problem Text Simulator</title>
- </head>
- <body>
-   <h1>N-Queens Problem Text Simulator</h1>
-   
-   <div class="controls">
-     <label for="boardSize">Board Size (N):</label>
-     <input type="number" id="boardSize" min="1" max="12" value="4">
-     <button id="solveButton">Solve</button>
-   </div>
-   
-   <div id="output">Solution will appear here...</div>
-   
-   <div class="explanation">
-     <h3>About the N-Queens Problem:</h3>
-     <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means no two queens can share the same row, column, or diagonal.</p>
-     <p>In the output:</p>
-     <ul>
-       <li>'Q' represents a queen</li>
-       <li>'.' represents an empty cell</li>
-     </ul>
-   </div>
-   
-   <script>
-     document.getElementById('solveButton').addEventListener('click', () => {
-       const n = parseInt(document.getElementById('boardSize').value);
-       if (n < 1 || n > 12) {
-         alert('Please enter a board size between 1 and 12');
-         return;
-       }
-       
-       const solutions = solveNQueens(n);
-       displaySolutions(solutions);
-     });
-     
-     function solveNQueens(n) {
-       const solutions = [];
-       const board = Array(n).fill().map(() => Array(n).fill('.'));
-       let traceLog = [];
+<html lang="en">
 
-       function isSafe(row, col) {
-         // Check row
-         for (let i = 0; i < col; i++) {
-           if (board[row][i] === 'Q') return false;
-         }
-         
-         // Check upper diagonal
-         for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-           if (board[i][j] === 'Q') return false;
-         }
-         
-         // Check lower diagonal
-         for (let i = row, j = col; i < n && j >= 0; i++, j--) {
-           if (board[i][j] === 'Q') return false;
-         }
-         
-         return true;
-       }
-       
-       function backtrack(col) {
-         if (col === n) {
-           // Found a solution, add it
-           const solution = board.map(row => row.join(''));
-           solutions.push(solution);
-           traceLog.push(`${'  '.repeat(depth)}✔️ solution found:\n${solution.join('\n')}\n`);
-           return;
-         }
-         
-         for (let row = 0; row < n; row++) {
-           if (isSafe(row, col)) {
-             board[row][col] = 'Q';
-             traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})`);
-             backtrack(col + 1);
-             board[row][col] = '.'; // Backtrack
-             traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})`);
-           } else {
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>N-Queens Problem Text Simulator</title>
+</head>
+
+<body>
+  <h1>N-Queens Problem Text Simulator</h1>
+
+  <div class="controls">
+    <label for="boardSize">Board Size (N):</label>
+    <input type="number" id="boardSize" min="1" max="12" value="4">
+    <button id="solveButton">Solve</button>
+  </div>
+
+  <div id="output">Solution will appear here...</div>
+
+  <div class="explanation">
+    <h3>About the N-Queens Problem:</h3>
+    <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten
+      each other. This means no two queens can share the same row, column, or diagonal.</p>
+    <p>In the output:</p>
+    <ul>
+      <li>'Q' represents a queen</li>
+      <li>'.' represents an empty cell</li>
+    </ul>
+  </div>
+
+  <script>
+
+    document.getElementById('solveButton').addEventListener('click', () => {
+      const n = parseInt(document.getElementById('boardSize').value);
+      if (n < 1 || n > 12) {
+        alert('Please enter a board size between 1 and 12');
+        return;
+      }
+
+      const { solutions, traceLog } = solveNQueens(n);
+      displaySolutions(solutions, traceLog);
+    });
+
+    function solveNQueens(n) {
+      const solutions = [];
+      const board = Array(n).fill().map(() => Array(n).fill('.'));
+      let traceLog = [];
+
+      function isSafe(row, col) {
+        // Check row
+        for (let i = 0; i < col; i++) {
+          if (board[row][i] === 'Q') return false;
+        }
+
+        // Check upper diagonal
+        for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+          if (board[i][j] === 'Q') return false;
+        }
+
+        // Check lower diagonal
+        for (let i = row, j = col; i < n && j >= 0; i++, j--) {
+          if (board[i][j] === 'Q') return false;
+        }
+
+        return true;
+      }
+
+      function backtrack(col, depth = 0) {
+        if (col === n) {
+          // Found a solution, add it
+          const solution = board.map(row => row.join(''));
+          solutions.push(solution);
+          traceLog.push(`${'  '.repeat(depth)}✔️ solution found:\n${solution.join('\n')}\n`);
+          return;
+        }
+
+        for (let row = 0; row < n; row++) {
+          if (isSafe(row, col)) {
+            board[row][col] = 'Q';
+            traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})`);
+            backtrack(col + 1);
+            board[row][col] = '.'; // Backtrack
+            traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})`);
+          } else {
             traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})`);
-           }
-         }
-       }
-       
-       backtrack(0);
-       return { solutions, traceLog };
-     }
-     
-     function displaySolutions(solutions, traceLog) {
-       const outputDiv = document.getElementById('output');
-       
-       if (solutions.length === 0) {
-         outputDiv.textContent = "No solutions found!";
-         return;
-       }
-       
-       let output = `Found ${solutions.length} solution${solutions.length > 1 ? 's' : ''}:\n\n`;
-       
-       // Display first solution fully
-       output += "Solution 1:\n";
-       for (let i = 0; i < solutions[0].length; i++) {
-         output += solutions[0][i] + "\n";
-       }
-       
-       // If there are more solutions, show a sample
-       if (solutions.length > 1) {
-         output += "\nSolution 2:\n";
-         for (let i = 0; i < solutions[1].length; i++) {
-           output += solutions[1][i] + "\n";
-         }
-         
-         if (solutions.length > 2) {
-           output += `\n...and ${solutions.length - 2} more solution${solutions.length > 3 ? 's' : ''}.`;
-         }
-       }
-       
-       outputDiv.textContent = output;
-     }
-   </script>
- </body>
- </html>
+          }
+        }
+      }
+
+      backtrack(0);
+      return { solutions, traceLog };
+    }
+
+    function displaySolutions(solutions, traceLog) {
+      const outputDiv = document.getElementById('output');
+
+      let output = '';
+
+      if (solutions.length === 0) {
+        output += "No solutions found!\n\n";
+        return;
+      } else {
+        output += `Found ${solutions.length} solution${solutions.length > 1 ? 's' : ''}:\n\n`;
+      }
+
+      // Display first solution fully
+      output += "Solution 1:\n";
+      for (let i = 0; i < solutions[0].length; i++) {
+        output += solutions[0][i] + "\n";
+      }
+
+      // If there are more solutions, show a sample
+      if (solutions.length > 1) {
+        output += "\nSolution 2:\n";
+        for (let i = 0; i < solutions[1].length; i++) {
+          output += solutions[1][i] + "\n";
+        }
+
+        if (solutions.length > 2) {
+          output += `\n...and ${solutions.length - 2} more solution${solutions.length > 3 ? 's' : ''}.`;
+        }
+      }
+
+      output += `\n\n📜 Recursive Call Trace:\n` + traceLog.join('\n');
+      outputDiv.textContent = output;
+    }
+  </script>
+</body>
+
+</html>
