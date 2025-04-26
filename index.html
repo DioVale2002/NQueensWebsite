@@ -1,40 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <title>N-Queens Problem Text Simulator</title>
 </head>
+
 <body>
-  <div class="header">
-    <h1>N-Queens Problem Simulation</h1>
-  </div>
-  
+  <h1>N-Queens Problem Text Simulator</h1>
+
   <div class="controls">
     <label for="boardSize">Board Size (N):</label>
     <input type="number" id="boardSize" min="1" max="12" value="4">
     <button id="solveButton">Solve</button>
   </div>
-  
-  <div class="solution-count-div" id="solution-count-div">
-    <h1 class="solution-count" id="solution-count"></h1>
-  </div>
-  <div class="board" id="chessboard"></div>
-  <div class="solution-number-div" id="solution-number-div">
-    <h1 class="solution-number" id="solution-number"></h1>
-    <button class="btns" id="prevSolution"><img src="prev_button.png" alt="prevButton" class="btnImg"></button>
-    <button class="btns" id="nextSolution"><img src="next_button.png" alt="nextButton" class="btnImg"></button>
-  </div>
-  
+
+  <div id="output">Solution will appear here...</div>
+
   <div class="explanation">
-    <h2>About the N-Queens Problem:</h2>
-    <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means no two queens can share the same row, column, or diagonal.</p>
+    <h3>About the N-Queens Problem:</h3>
+    <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten
+      each other. This means no two queens can share the same row, column, or diagonal.</p>
+    <p>In the output:</p>
+    <ul>
+      <li>'Q' represents a queen</li>
+      <li>'.' represents an empty cell</li>
+    </ul>
   </div>
-  
+
   <script>
-    let solutions = [];
-    let solutionCount;
 
     document.getElementById('solveButton').addEventListener('click', () => {
       const n = parseInt(document.getElementById('boardSize').value);
@@ -42,140 +38,96 @@
         alert('Please enter a board size between 1 and 12');
         return;
       }
-      
-      solutions = solveNQueens(n);
-      solutionCount = 0;
-      displayBoard(solutionCount);
+
+      const { solutions, traceLog } = solveNQueens(n);
+      displaySolutions(solutions, traceLog);
     });
 
-    document.getElementById('prevSolution').addEventListener('click', () => {
-      if (solutions.length > 0 || (solutionCount + 1) >= solutions.length) {
-        solutionCount--;
-        displayBoard(solutionCount);
-      }
-    });
-    
-    document.getElementById('nextSolution').addEventListener('click', () => {
-      if (solutions.length > 0 || (solutionCount + 1) < solutions.length) {
-        solutionCount++;
-        displayBoard(solutionCount);
-      }
-    });
-    
     function solveNQueens(n) {
-      solutions = [];
+      const solutions = [];
       const board = Array(n).fill().map(() => Array(n).fill('.'));
-      
+      let traceLog = [];
+
       function isSafe(row, col) {
         // Check row
         for (let i = 0; i < col; i++) {
           if (board[row][i] === 'Q') return false;
         }
-        
+
         // Check upper diagonal
         for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
           if (board[i][j] === 'Q') return false;
         }
-        
+
         // Check lower diagonal
         for (let i = row, j = col; i < n && j >= 0; i++, j--) {
           if (board[i][j] === 'Q') return false;
         }
-        
+
         return true;
       }
-      
-      function backtrack(col) {
+
+      function backtrack(col, depth = 0) {
         if (col === n) {
           // Found a solution, add it
           const solution = board.map(row => row.join(''));
           solutions.push(solution);
+          traceLog.push(`${'  '.repeat(depth)}✔️ solution found:\n${solution.join('\n')}\n`);
           return;
         }
-        
+
         for (let row = 0; row < n; row++) {
           if (isSafe(row, col)) {
             board[row][col] = 'Q';
+            traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})`);
             backtrack(col + 1);
             board[row][col] = '.'; // Backtrack
+            traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})`);
+          } else {
+            traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})`);
           }
         }
       }
-      
+
       backtrack(0);
-      return solutions;
+      return { solutions, traceLog };
     }
 
-    function displayBoard(solutionCount) {
-      const boardDiv = document.getElementById('chessboard');
-      const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
-      const prevButton = document.getElementById('prevSolution');
-      const nextButton = document.getElementById('nextSolution');
-      const solutionCountDiv = document.getElementById('solution-count-div');
+    function displaySolutions(solutions, traceLog) {
+      const outputDiv = document.getElementById('output');
 
-      if(solutions == null || solutions.length === 0) {
-        boardDiv.style.display = 'none';
-        prevButton.style.display = 'none';
-        nextButton.style.display = 'none';
-        solutionCurrentNumberDiv.style.display = 'none';
-        solutionCountDiv.textContent = "No solutions found!";
-        return; 
+      let output = '';
+
+      if (solutions.length === 0) {
+        output += "No solutions found!\n\n";
+        outputDiv.textContent = output;
+        return;
+      } else {
+        output += `Found ${solutions.length} solution${solutions.length > 1 ? 's' : ''}:\n\n`;
       }
 
-      if(solutions.length === 1) {
-        prevButton.style.display = 'none';
-        nextButton.style.display = 'none';
-      } 
-
-      solutionCountDiv.style.display = 'block';
-      document.getElementById('solution-count').innerText = `${solutions.length} Solution${solutions.length > 1 ? 's' : ''} Found!`;
-      boardDiv.style.display = 'grid';
-      solutionCurrentNumberDiv.style.display = 'flex';
-      prevButton.style.visibility = 'visible';
-      prevButton.style.display = 'block';
-      nextButton.style.visibility = 'visible';
-      nextButton.style.display = 'block';
-
-      if((solutionCount+1) === solutions.length){ //hide next button
-        nextButton.style.visibility = 'hidden';
+      // Display first solution fully
+      output += "Solution 1:\n";
+      for (let i = 0; i < solutions[0].length; i++) {
+        output += solutions[0][i] + "\n";
       }
 
-      if(solutionCount === 0) { //hide prev button
-        prevButton.style.visibility = 'hidden';
-      }
-      
-      const N = solutions[0].length;
+      // If there are more solutions, show a sample
+      if (solutions.length > 1) {
+        output += "\nSolution 2:\n";
+        for (let i = 0; i < solutions[1].length; i++) {
+          output += solutions[1][i] + "\n";
+        }
 
-      document.getElementById('solution-number').innerText = `Solution ${solutionCount + 1}`;
-
-      boardDiv.innerHTML = ''; // Clear previous board
-      boardDiv.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
-      boardDiv.style.gridTemplateRows = `repeat(${N}, 1fr)`;
-
-      for (let row = 0; row < N; row++) {
-        for (let col = 0; col < N; col++) {
-          const cell = document.createElement('div');
-          cell.classList.add('cell');
-
-          if ((row + col) % 2 === 0) {
-            cell.classList.add('white');
-          } else {
-            cell.classList.add('light-brown');
-          }
-
-          // Add queen if 'Q'
-          if (solutions[solutionCount][row][col] === 'Q') {
-            const queen = document.createElement('img');
-            queen.src = 'queen_Image.png';
-            queen.alt = 'queen';
-            queen.classList.add('queen');
-            cell.appendChild(queen);
-          }
-
-          boardDiv.appendChild(cell);
+        if (solutions.length > 2) {
+          output += `\n...and ${solutions.length - 2} more solution${solutions.length > 3 ? 's' : ''}.`;
         }
       }
+
+      output += `\n\n📜 Recursive Call Trace:\n` + traceLog.join('\n');
+      outputDiv.textContent = output;
     }
   </script>
 </body>
+
 </html>

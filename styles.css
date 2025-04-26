@@ -1,144 +1,37 @@
-    *{
-    font-family: monospace;
-    }
-    body {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .header {
-      width: 800px;
-    }
+body {
+  font-family: monospace;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-    .header h1 {
-      font-size: 45px;
-      text-align: center;
-      color: #333;
-    }
-    
-    .controls {
-      margin: 20px 0;
-      text-align: center;
-    }
+h1 {
+  color: #333;
+  text-align: center;
+}
 
-    .controls label {
-      font-size: 20px;
-      color: #333;
-    }
+.controls {
+  margin: 20px 0;
+  text-align: center;
+}
 
-    .controls button{
-      background-color: #BA9C9C;
-      font-size: 18px;
-      padding: 8px 12px;
-      margin: 0 5px;
-      border-radius: 5px;
-    }
+input, button {
+  padding: 8px 12px;
+  margin: 0 5px;
+}
 
-    .controls button:hover{
-      cursor: pointer;
-      background-color: #8b6363;
-    }
-    
-    .controls input{
-      font-size: 18px;
-      padding: 8px 12px;
-      margin: 2px 5px;
-    }
+#output {
+  white-space: pre;
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-top: 20px;
+  text-align: left;
+  min-height: 200px;
+}
 
-    .solution-count-div {
-      margin: 0 auto;
-      font-size: 15px;
-      width: 600px;
-      height: 60px;
-      display: none;
-    }
-
-    .solution-count {
-      font-size: 30px;
-      font-weight: bold;
-      color: #3f2424;
-      text-align: center;
-    }
-
-    .board {
-      margin: 0 auto;
-      width: 600px;
-      height: 600px;
-      display: none;
-      border: 2px solid black;
-    }
-    
-    .cell {
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .white {
-      background-color: #FFFFFF;
-    }
-
-    .light-brown {
-      background-color: #BA9C9C;
-    }
-
-    .queen {
-      width: 90%;
-      height: 90%;
-      object-fit: contain;
-      pointer-events: none;
-    }
-
-    .solution-number-div{
-      margin: 0 auto;
-      width: 604px;
-      height: 60px;
-      display: none;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .solution-number{
-      font-size: 30px;
-      font-weight: bold;
-      text-align: start;
-      color: #3f2424;
-      width: 410px;
-    }
-
-    .btns{
-      background-color: #BA9C9C;
-      display: none
-    }
-
-    .btns:hover{
-      cursor: pointer;
-      background-color: #6d5656;
-    }
-
-    .btnImg{  
-      width: 30px;
-      height: 30px;
-      margin: 5px 4px;
-    }
-
-    .explanation {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .explanation h2 {
-      font-size: 24px;
-      color: #333;
-    }
-
-    .explanation p {
-      font-size: 18px;
-      text-align: justify;
-      color: #555;
-    }
+.explanation {
+  text-align: left;
+  margin-top: 20px;
+}
