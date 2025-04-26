@@ -100,6 +100,7 @@
 
       if (solutions.length === 0) {
         output += "No solutions found!\n\n";
+        outputDiv.textContent = output;
         return;
       } else {
         output += `Found ${solutions.length} solution${solutions.length > 1 ? 's' : ''}:\n\n`;
