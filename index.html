@@ -23,19 +23,40 @@
   <div class="board" id="chessboard"></div>
   <div class="solution-number-div" id="solution-number-div">
     <h1 class="solution-number" id="solution-number"></h1>
+    <button class="btns" id="showTrackLog">Show TrackLog</button>
     <button class="btns" id="prevSolution"><img src="prev_button.png" alt="prevButton" class="btnImg"></button>
     <button class="btns" id="nextSolution"><img src="next_button.png" alt="nextButton" class="btnImg"></button>
   </div>
-  
+
+  <div id="trackLogModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModalBtn" class="close">&times;</span>
+      <h2>Trace Log</h2>
+      <p id="traceParagraph"></p>
+    </div>
+  </div>
+
   <div class="explanation">
     <h2>About the N-Queens Problem:</h2>
     <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means no two queens can share the same row, column, or diagonal.</p>
   </div>
   
   <script>
-    let solutions = [];
-    let solutionCount;
+    const traceLogModal = document.getElementById('trackLogModal');
+    const openTraceLog = document.getElementById('showTrackLog');
+    const closeTraceLog = document.getElementById('closeModalBtn');
+    const boardDiv = document.getElementById('chessboard');
+    const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
+    const prevButton = document.getElementById('prevSolution');
+    const nextButton = document.getElementById('nextSolution');
+    const solutionCountDiv = document.getElementById('solution-count-div');
 
+    let solutions = [];
+    let traceLog = [];
+    let solutionCount;
+    let solutionTraceCounter = 0;
+
+    // to solve n-queens problem
     document.getElementById('solveButton').addEventListener('click', () => {
       const n = parseInt(document.getElementById('boardSize').value);
       if (n < 1 || n > 12) {
@@ -43,11 +64,12 @@
         return;
       }
       
-      solutions = solveNQueens(n);
       solutionCount = 0;
+      [solutions, traceLog] = solveNQueens(n);
       displayBoard(solutionCount);
     });
 
+    // to display previous solution
     document.getElementById('prevSolution').addEventListener('click', () => {
       if (solutions.length > 0 || (solutionCount + 1) >= solutions.length) {
         solutionCount--;
@@ -55,13 +77,36 @@
       }
     });
     
+    //to display next solution
     document.getElementById('nextSolution').addEventListener('click', () => {
       if (solutions.length > 0 || (solutionCount + 1) < solutions.length) {
         solutionCount++;
         displayBoard(solutionCount);
       }
     });
-    
+
+    // Open trackLog
+    openTraceLog.addEventListener('click', () => {
+      traceLogModal.style.display = 'block';
+      const traceParagraph = document.getElementById('traceParagraph');
+
+      // Clear previous content
+      traceParagraph.textContent = '';
+      traceParagraph.textContent = traceLog.join('');
+    });
+
+    // Close trackLog
+    closeTraceLog.addEventListener('click', () => {
+      traceLogModal.style.display = 'none';
+    });
+
+    // Close tracklog when clicking outside the content
+    window.addEventListener('click', (event) => {
+      if (event.target === traceLogModal) {
+        traceLogModal.style.display = 'none';
+      }
+    });
+
     function solveNQueens(n) {
       solutions = [];
       const board = Array(n).fill().map(() => Array(n).fill('.'));
@@ -85,57 +130,46 @@
         return true;
       }
       
-      function backtrack(col) {
+      function backtrack(col, depth = 0) {
         if (col === n) {
           // Found a solution, add it
           const solution = board.map(row => row.join(''));
           solutions.push(solution);
+          traceLog.push(`${'  '.repeat(depth)}✔️ Solution ${solutionTraceCounter+1} found!\n\n`);
+          solutionTraceCounter++;
           return;
         }
-        
+
         for (let row = 0; row < n; row++) {
           if (isSafe(row, col)) {
             board[row][col] = 'Q';
+            traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
             backtrack(col + 1);
             board[row][col] = '.'; // Backtrack
+            traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
+          } else {
+            traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
           }
         }
       }
-      
       backtrack(0);
-      return solutions;
+      return [solutions, traceLog];
     }
 
     function displayBoard(solutionCount) {
-      const boardDiv = document.getElementById('chessboard');
-      const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
-      const prevButton = document.getElementById('prevSolution');
-      const nextButton = document.getElementById('nextSolution');
-      const solutionCountDiv = document.getElementById('solution-count-div');
-
       if(solutions == null || solutions.length === 0) {
-        boardDiv.style.display = 'none';
-        prevButton.style.display = 'none';
-        nextButton.style.display = 'none';
-        solutionCurrentNumberDiv.style.display = 'none';
+        hideElements();
         solutionCountDiv.style.display = 'block';
         document.getElementById('solution-count').innerText  = "No solutions found!";
         return; 
       }
 
       if(solutions.length === 1) {
-        prevButton.style.display = 'none';
-        nextButton.style.display = 'none';
+        hideButtons();
       } 
 
-      solutionCountDiv.style.display = 'block';
+      showElements();
       document.getElementById('solution-count').innerText = `${solutions.length} Solution${solutions.length > 1 ? 's' : ''} Found!`;
-      boardDiv.style.display = 'grid';
-      solutionCurrentNumberDiv.style.display = 'flex';
-      prevButton.style.visibility = 'visible';
-      prevButton.style.display = 'block';
-      nextButton.style.visibility = 'visible';
-      nextButton.style.display = 'block';
 
       if((solutionCount+1) === solutions.length){ //hide next button
         nextButton.style.visibility = 'hidden';
@@ -176,6 +210,30 @@
           boardDiv.appendChild(cell);
         }
       }
+    }
+
+    function showElements(){
+      solutionCountDiv.style.display = 'block';
+      openTraceLog.style.display = 'block';
+      boardDiv.style.display = 'grid';
+      solutionCurrentNumberDiv.style.display = 'flex';
+      prevButton.style.visibility = 'visible';
+      prevButton.style.display = 'block';
+      nextButton.style.visibility = 'visible';
+      nextButton.style.display = 'block';
+    }
+
+    function hideElements(){
+      boardDiv.style.display = 'none';
+      prevButton.style.display = 'none';
+      nextButton.style.display = 'none';
+      openTraceLog.style.display = 'none';
+      solutionCurrentNumberDiv.style.display = 'none';
+    }
+
+    function hideButtons(){
+      prevButton.style.display = 'none';
+      nextButton.style.display = 'none';
     }
   </script>
 </body>
