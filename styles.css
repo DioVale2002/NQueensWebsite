@@ -238,3 +238,15 @@ input, button {
   margin-top: 20px;
 }
 
+.solution-count-div {
+  margin: 0 auto 30px auto;
+  font-size: 15px;
+  width: 600px;
+  height: 60px;
+  display: none;
+  position: relative;
+  z-index: 10;        
+  background-color: rgba(255, 255, 255, 0.9); 
+}
+
+

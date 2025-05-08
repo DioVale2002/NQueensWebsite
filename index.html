@@ -19,6 +19,7 @@
   
   <div class="solution-count-div" id="solution-count-div">
     <h1 class="solution-count" id="solution-count"></h1>
+    <h2 class="runtime-display" id="runtime-display"></h2>
   </div>
   <div class="board" id="chessboard"></div>
   <div class="solution-number-div" id="solution-number-div">
@@ -65,7 +66,16 @@
       }
       
       solutionCount = 0;
+
+      const startTime = performance.now();
       [solutions, traceLog] = solveNQueens(n);
+      const endTime = performance.now();
+      const runTime = (endTime - startTime).toFixed(2);
+
+      const runtimeDisplay = document.getElementById('runtime-display');
+      runtimeDisplay.innerText = `⏱️ Solving took ${runTime} ms`;
+      solutionCountDiv.style.display = 'block';
+
       displayBoard(solutionCount);
     });
 
