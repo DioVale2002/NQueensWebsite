@@ -51,16 +51,12 @@
     const prevButton = document.getElementById('prevSolution');
     const nextButton = document.getElementById('nextSolution');
     const solutionCountDiv = document.getElementById('solution-count-div');
-
+  
     let solutions = [];
-    let traceLog = [];
     let solutionCount;
     let solutionTraceCounter = 0;
-
-
-    // to solve n-queens problem
+  
     document.getElementById('solveButton').addEventListener('click', () => {
-      traceLog = []; 
       document.getElementById("traceParagraph").innerText = ""; 
       solutionTraceCounter = 0; 
       const n = parseInt(document.getElementById('boardSize').value);
@@ -68,151 +64,128 @@
         alert('Please enter a board size between 1 and 12');
         return;
       }
-      
+  
       solutionCount = 0;
-
+  
       const startTime = performance.now();
-      [solutions, traceLog] = solveNQueens(n);
+      solutions = solveNQueens(n);
       const endTime = performance.now();
       const runTime = (endTime - startTime).toFixed(2);
-
+  
       const runtimeDisplay = document.getElementById('runtime-display');
       runtimeDisplay.innerText = `⏱️ Solving took ${runTime} ms`;
       solutionCountDiv.style.display = 'block';
-
+  
       displayBoard(solutionCount);
     });
-
-    // to display previous solution
+  
     document.getElementById('prevSolution').addEventListener('click', () => {
       if (solutions.length > 0 || (solutionCount + 1) >= solutions.length) {
         solutionCount--;
         displayBoard(solutionCount);
       }
     });
-    
-    //to display next solution
+  
     document.getElementById('nextSolution').addEventListener('click', () => {
       if (solutions.length > 0 || (solutionCount + 1) < solutions.length) {
         solutionCount++;
         displayBoard(solutionCount);
       }
     });
-
-    // Open trackLog
+  
     openTraceLog.addEventListener('click', () => {
       traceLogModal.style.display = 'block';
-      const traceParagraph = document.getElementById('traceParagraph');
-
-      // Clear previous content
-      traceParagraph.textContent = '';
-      traceParagraph.textContent = traceLog.join('');
+      document.getElementById('traceParagraph').textContent = 'Trace log is disabled in this version.';
     });
-
-    // Close trackLog
+  
     closeTraceLog.addEventListener('click', () => {
       traceLogModal.style.display = 'none';
     });
-
-    // Close tracklog when clicking outside the content
+  
     window.addEventListener('click', (event) => {
       if (event.target === traceLogModal) {
         traceLogModal.style.display = 'none';
       }
     });
-
+  
     function solveNQueens(n) {
       solutions = [];
       const board = Array(n).fill().map(() => Array(n).fill('.'));
-      
+  
       function isSafe(row, col) {
-        // Check row
         for (let i = 0; i < col; i++) {
           if (board[row][i] === 'Q') return false;
         }
-        
-        // Check upper diagonal
+  
         for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
           if (board[i][j] === 'Q') return false;
         }
-        
-        // Check lower diagonal
+  
         for (let i = row, j = col; i < n && j >= 0; i++, j--) {
           if (board[i][j] === 'Q') return false;
         }
-        
+  
         return true;
       }
-      
-      function backtrack(col, depth = 0) {
+  
+      function backtrack(col) {
         if (col === n) {
-          // Found a solution, add it
           const solution = board.map(row => row.join(''));
           solutions.push(solution);
-          traceLog.push(`${'  '.repeat(depth)}✔️ Solution ${solutionTraceCounter+1} found!\n\n`);
           solutionTraceCounter++;
           return;
         }
-
+  
         for (let row = 0; row < n; row++) {
           if (isSafe(row, col)) {
             board[row][col] = 'Q';
-            traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
             backtrack(col + 1);
-            board[row][col] = '.'; // Backtrack
-            traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
-          } else {
-            traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
+            board[row][col] = '.';
           }
         }
       }
+  
       backtrack(0);
-      return [solutions, traceLog];
+      return solutions;
     }
-
+  
     function displayBoard(solutionCount) {
-      if(solutions == null || solutions.length === 0) {
+      if (solutions == null || solutions.length === 0) {
         hideElements();
         solutionCountDiv.style.display = 'block';
         document.getElementById('solution-count').innerText  = "No solutions found!";
         return; 
       }
-
-      if(solutions.length === 1) {
+  
+      if (solutions.length === 1) {
         hideButtons();
       } 
-
+  
       showElements();
       document.getElementById('solution-count').innerText = `${solutions.length} Solution${solutions.length > 1 ? 's' : ''} Found!`;
-
-      if((solutionCount+1) === solutions.length){ //hide next button
-        nextButton.style.visibility = 'hidden';
-      }
-
-      if(solutionCount === 0) { //hide prev button
-        prevButton.style.visibility = 'hidden';
-      }
-      
+  
+      nextButton.style.visibility = (solutionCount + 1 === solutions.length) ? 'hidden' : 'visible';
+      prevButton.style.visibility = (solutionCount === 0) ? 'hidden' : 'visible';
+  
       const N = solutions[0].length;
-
+  
       document.getElementById('solution-number').innerText = `Solution ${solutionCount + 1}`;
-
-      boardDiv.innerHTML = ''; // Clear previous board
+  
+      boardDiv.innerHTML = '';
       boardDiv.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
       boardDiv.style.gridTemplateRows = `repeat(${N}, 1fr)`;
-
+  
       for (let row = 0; row < N; row++) {
         for (let col = 0; col < N; col++) {
           const cell = document.createElement('div');
           cell.classList.add('cell');
-
+  
           if ((row + col) % 2 === 0) {
             cell.classList.add('white');
           } else {
             cell.classList.add('light-brown');
           }
-
-          // Add queen if 'Q'
+  
           if (solutions[solutionCount][row][col] === 'Q') {
             const queen = document.createElement('img');
             queen.src = 'queen_Image.png';
@@ -220,13 +193,13 @@
             queen.classList.add('queen');
             cell.appendChild(queen);
           }
-
+  
           boardDiv.appendChild(cell);
         }
       }
     }
-
-    function showElements(){
+  
+    function showElements() {
       solutionCountDiv.style.display = 'block';
       openTraceLog.style.display = 'block';
       boardDiv.style.display = 'grid';
@@ -236,19 +209,20 @@
       nextButton.style.visibility = 'visible';
       nextButton.style.display = 'block';
     }
-
-    function hideElements(){
+  
+    function hideElements() {
       boardDiv.style.display = 'none';
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
       openTraceLog.style.display = 'none';
       solutionCurrentNumberDiv.style.display = 'none';
     }
-
-    function hideButtons(){
+  
+    function hideButtons() {
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
     }
   </script>
+  
 </body>
 </html>
