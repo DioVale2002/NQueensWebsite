@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <title>N-Queens Problem Simulation</title>
 </head>
+
 <body>
   <div class="header">
     <h1>N-Queens Problem Simulation</h1>
   </div>
-  
+
   <div class="controls">
     <label for="boardSize">Board Size (N):</label>
     <input type="number" id="boardSize" min="1" max="12" value="4">
     <button id="solveButton">Solve</button>
   </div>
-  
+
   <div class="solution-count-div" id="solution-count-div">
     <h1 class="solution-count" id="solution-count"></h1>
     <h2 class="runtime-display" id="runtime-display"></h2>
@@ -39,216 +41,156 @@
 
   <div class="explanation">
     <h2>About the N-Queens Problem:</h2>
-    <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten each other. This means no two queens can share the same row, column, or diagonal.</p>
+    <p>The N-Queens puzzle is the problem of placing N chess queens on an N×N chessboard so that no two queens threaten
+      each other. This means no two queens can share the same row, column, or diagonal.</p>
   </div>
-  
+
   <script>
-    const traceLogModal = document.getElementById('trackLogModal');
-    const openTraceLog = document.getElementById('showTrackLog');
-    const closeTraceLog = document.getElementById('closeModalBtn');
     const boardDiv = document.getElementById('chessboard');
     const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
     const prevButton = document.getElementById('prevSolution');
     const nextButton = document.getElementById('nextSolution');
     const solutionCountDiv = document.getElementById('solution-count-div');
-
+  
     let solutions = [];
-    let traceLog = [];
-    let solutionCount;
-    let solutionTraceCounter = 0;
-
-
-    // to solve n-queens problem
+    let solutionCount = 0;
+  
+    // Solve n-queens problem
     document.getElementById('solveButton').addEventListener('click', () => {
-      traceLog = []; 
-      document.getElementById("traceParagraph").innerText = ""; 
-      solutionTraceCounter = 0; 
       const n = parseInt(document.getElementById('boardSize').value);
       if (n < 1 || n > 12) {
         alert('Please enter a board size between 1 and 12');
         return;
       }
-      
+  
       solutionCount = 0;
-
+  
       const startTime = performance.now();
-      [solutions, traceLog] = solveNQueens(n);
+      solutions = solveNQueens(n);
       const endTime = performance.now();
       const runTime = (endTime - startTime).toFixed(2);
-
-      const runtimeDisplay = document.getElementById('runtime-display');
-      runtimeDisplay.innerText = `⏱️ Solving took ${runTime} ms`;
+  
+      document.getElementById('runtime-display').innerText = `⏱️ Solving took ${runTime} ms`;
       solutionCountDiv.style.display = 'block';
-
+  
       displayBoard(solutionCount);
     });
-
-    // to display previous solution
-    document.getElementById('prevSolution').addEventListener('click', () => {
-      if (solutions.length > 0 || (solutionCount + 1) >= solutions.length) {
+  
+    // Previous solution
+    prevButton.addEventListener('click', () => {
+      if (solutions.length > 0 && solutionCount > 0) {
         solutionCount--;
         displayBoard(solutionCount);
       }
     });
-    
-    //to display next solution
-    document.getElementById('nextSolution').addEventListener('click', () => {
-      if (solutions.length > 0 || (solutionCount + 1) < solutions.length) {
+  
+    // Next solution
+    nextButton.addEventListener('click', () => {
+      if (solutions.length > 0 && solutionCount < solutions.length - 1) {
         solutionCount++;
         displayBoard(solutionCount);
       }
     });
-
-    // Open trackLog
-    openTraceLog.addEventListener('click', () => {
-      traceLogModal.style.display = 'block';
-      const traceParagraph = document.getElementById('traceParagraph');
-
-      // Clear previous content
-      traceParagraph.textContent = '';
-      traceParagraph.textContent = traceLog.join('');
-    });
-
-    // Close trackLog
-    closeTraceLog.addEventListener('click', () => {
-      traceLogModal.style.display = 'none';
-    });
-
-    // Close tracklog when clicking outside the content
-    window.addEventListener('click', (event) => {
-      if (event.target === traceLogModal) {
-        traceLogModal.style.display = 'none';
-      }
-    });
-
+  
     function solveNQueens(n) {
-      solutions = [];
-      const board = Array(n).fill().map(() => Array(n).fill('.'));
-      
-      function isSafe(row, col) {
-        // Check row
-        for (let i = 0; i < col; i++) {
-          if (board[row][i] === 'Q') return false;
-        }
-        
-        // Check upper diagonal
-        for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
-          if (board[i][j] === 'Q') return false;
-        }
-        
-        // Check lower diagonal
-        for (let i = row, j = col; i < n && j >= 0; i++, j--) {
-          if (board[i][j] === 'Q') return false;
-        }
-        
-        return true;
-      }
-      
-      function backtrack(col, depth = 0) {
-        if (col === n) {
-          // Found a solution, add it
-          const solution = board.map(row => row.join(''));
-          solutions.push(solution);
-          traceLog.push(`${'  '.repeat(depth)}✔️ Solution ${solutionTraceCounter+1} found!\n\n`);
-          solutionTraceCounter++;
+      const result = [];
+      const cols = new Set();
+      const posDiag = new Set();
+      const negDiag = new Set();
+      const board = Array.from({ length: n }, () => Array(n).fill('.'));
+  
+      function backtrack(row) {
+        if (row === n) {
+          result.push(board.map(r => r.join('')));
           return;
         }
-
-        for (let row = 0; row < n; row++) {
-          if (isSafe(row, col)) {
-            board[row][col] = 'Q';
-            traceLog.push(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
-            backtrack(col + 1);
-            board[row][col] = '.'; // Backtrack
-            traceLog.push(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
-          } else {
-            traceLog.push(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
-          }
+  
+        for (let col = 0; col < n; col++) {
+          if (cols.has(col) || posDiag.has(row + col) || negDiag.has(row - col)) continue;
+  
+          cols.add(col);
+          posDiag.add(row + col);
+          negDiag.add(row - col);
+          board[row][col] = 'Q';
+  
+          backtrack(row + 1);
+  
+          cols.delete(col);
+          posDiag.delete(row + col);
+          negDiag.delete(row - col);
+          board[row][col] = '.';
         }
       }
+  
       backtrack(0);
-      return [solutions, traceLog];
+      return result;
     }
-
-    function displayBoard(solutionCount) {
-      if(solutions == null || solutions.length === 0) {
+  
+    function displayBoard(solutionIndex) {
+      if (!solutions || solutions.length === 0) {
         hideElements();
         solutionCountDiv.style.display = 'block';
-        document.getElementById('solution-count').innerText  = "No solutions found!";
-        return; 
+        document.getElementById('solution-count').innerText = "No solutions found!";
+        return;
       }
-
-      if(solutions.length === 1) {
+  
+      if (solutions.length === 1) {
         hideButtons();
-      } 
-
+      } else {
+        showElements();
+        prevButton.style.visibility = solutionIndex === 0 ? 'hidden' : 'visible';
+        nextButton.style.visibility = solutionIndex === solutions.length - 1 ? 'hidden' : 'visible';
+      }
+  
       showElements();
       document.getElementById('solution-count').innerText = `${solutions.length} Solution${solutions.length > 1 ? 's' : ''} Found!`;
-
-      if((solutionCount+1) === solutions.length){ //hide next button
-        nextButton.style.visibility = 'hidden';
-      }
-
-      if(solutionCount === 0) { //hide prev button
-        prevButton.style.visibility = 'hidden';
-      }
-      
+      document.getElementById('solution-number').innerText = `Solution ${solutionIndex + 1}`;
+  
       const N = solutions[0].length;
-
-      document.getElementById('solution-number').innerText = `Solution ${solutionCount + 1}`;
-
-      boardDiv.innerHTML = ''; // Clear previous board
+      boardDiv.innerHTML = '';
       boardDiv.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
       boardDiv.style.gridTemplateRows = `repeat(${N}, 1fr)`;
-
+  
       for (let row = 0; row < N; row++) {
         for (let col = 0; col < N; col++) {
           const cell = document.createElement('div');
           cell.classList.add('cell');
-
-          if ((row + col) % 2 === 0) {
-            cell.classList.add('white');
-          } else {
-            cell.classList.add('light-brown');
-          }
-
-          // Add queen if 'Q'
-          if (solutions[solutionCount][row][col] === 'Q') {
+          cell.classList.add((row + col) % 2 === 0 ? 'white' : 'light-brown');
+  
+          if (solutions[solutionIndex][row][col] === 'Q') {
             const queen = document.createElement('img');
             queen.src = 'queen_Image.png';
             queen.alt = 'queen';
             queen.classList.add('queen');
             cell.appendChild(queen);
           }
-
+  
           boardDiv.appendChild(cell);
         }
       }
     }
-
-    function showElements(){
+  
+    function showElements() {
       solutionCountDiv.style.display = 'block';
-      openTraceLog.style.display = 'block';
       boardDiv.style.display = 'grid';
       solutionCurrentNumberDiv.style.display = 'flex';
-      prevButton.style.visibility = 'visible';
       prevButton.style.display = 'block';
-      nextButton.style.visibility = 'visible';
       nextButton.style.display = 'block';
     }
-
-    function hideElements(){
+  
+    function hideElements() {
       boardDiv.style.display = 'none';
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
-      openTraceLog.style.display = 'none';
       solutionCurrentNumberDiv.style.display = 'none';
     }
-
-    function hideButtons(){
+  
+    function hideButtons() {
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
     }
   </script>
+  
 </body>
+
 </html>
