@@ -57,8 +57,12 @@
     let solutionCount;
     let solutionTraceCounter = 0;
 
+
     // to solve n-queens problem
     document.getElementById('solveButton').addEventListener('click', () => {
+      traceLog = []; 
+      document.getElementById("traceParagraph").innerText = ""; 
+      solutionTraceCounter = 0; 
       const n = parseInt(document.getElementById('boardSize').value);
       if (n < 1 || n > 12) {
         alert('Please enter a board size between 1 and 12');
