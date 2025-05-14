@@ -382,4 +382,85 @@ input, button {
   color: #666;
 }
 
+.legend-container {
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3f2424;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.legend-checking {
+  background-color: rgba(255, 224, 163, 0.9);
+}
+
+.legend-attack {
+  background-color: rgba(255, 102, 102, 0.3);
+}
+
+.legend-placed {
+  background-color: rgba(144, 238, 144, 0.5);
+}
+
+.legend-attacked {
+  background-color: rgba(255, 128, 128, 0.5);
+}
+
+.code-display {
+  margin: 20px auto;
+  max-width: 600px;
+  background-color: #1e1e1e;
+  border-radius: 5px;
+  padding: 15px;
+  font-family: 'Consolas', monospace;
+  color: #d4d4d4;
+  position: relative;
+  overflow-x: auto;
+}
+
+.code-line {
+  padding: 2px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.line-number {
+  color: #858585;
+  user-select: none;
+  min-width: 30px;
+  text-align: right;
+}
+
+.code-content {
+  flex: 1;
+}
+
+.code-highlight {
+  background-color: rgba(255, 224, 163, 0.2);
+}
+
+.code-comment {
+  color: #6a9955;
+}
+
 
