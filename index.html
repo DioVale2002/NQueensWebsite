@@ -14,9 +14,24 @@
   </div>
 
   <div class="controls">
-    <label for="boardSize">Board Size (N):</label>
-    <input type="number" id="boardSize" min="1" max="12" value="4">
-    <button id="solveButton">Solve</button>
+    <div class="control-row">
+      <label for="boardSize">Board Size (N):</label>
+      <input type="number" id="boardSize" min="1" max="12" value="4">
+    </div>
+    <div class="control-row">
+      <label for="algorithmType">Algorithm:</label>
+      <select id="algorithmType">
+        <option value="naive">Naive Approach</option>
+        <option value="optimized">Optimized Approach</option>
+      </select>
+      <label for="enableLogging">
+        <input type="checkbox" id="enableLogging" checked>
+        Enable Logging
+      </label>
+    </div>
+    <div class="control-row">
+      <button id="solveButton">Solve</button>
+    </div>
   </div>
 
   <div class="solution-count-div" id="solution-count-div">
@@ -58,6 +73,7 @@
     let solutions = [];
     let solutionCount;
     let solutionTraceCounter = 0;
+    let traceLog = [];
 
     document.getElementById('solveButton').addEventListener('click', () => {
       document.getElementById("traceParagraph").innerText = "";
@@ -71,7 +87,9 @@
       solutionCount = 0;
 
       const startTime = performance.now();
-      solutions = solveNQueens(n);
+      const result = solveNQueens(n);
+      solutions = result[0];
+      traceLog = result[1];
       const endTime = performance.now();
       const runTime = (endTime - startTime).toFixed(2);
 
@@ -98,7 +116,14 @@
 
     openTraceLog.addEventListener('click', () => {
       traceLogModal.style.display = 'block';
-      document.getElementById('traceParagraph').textContent = 'Trace log is disabled in this version.';
+      const traceParagraph = document.getElementById('traceParagraph');
+      traceParagraph.textContent = '';
+      
+      if (!document.getElementById('enableLogging').checked) {
+        traceParagraph.textContent = 'Logging is disabled. Enable logging to see the solution trace.';
+      } else {
+        traceParagraph.textContent = traceLog.join('');
+      }
     });
 
     closeTraceLog.addEventListener('click', () => {
@@ -112,49 +137,112 @@
     });
 
     function solveNQueens(n) {
-      const solutions = [];
-      const cols = new Array(n).fill(0);
-      const leftDiagonal = new Array(n * 2).fill(0);
-      const rightDiagonal = new Array(n * 2).fill(0);
-
-      function placeQueens(i, cur) {
-        if (i === n) {
-          // Convert cur (e.g., [2, 4, 1, 3]) to board string format
-          const board = Array.from({ length: n }, (_, row) => {
-            return '.'.repeat(cur[row] - 1) + 'Q' + '.'.repeat(n - cur[row]);
-          });
-          solutions.push(board);
-          return;
-        }
-
-        for (let j = 0; j < n; j++) {
-          if (cols[j] || rightDiagonal[i + j] || leftDiagonal[i - j + n - 1]) continue;
-
-          cols[j] = 1;
-          rightDiagonal[i + j] = 1;
-          leftDiagonal[i - j + n - 1] = 1;
-          cur.push(j + 1);
-
-          placeQueens(i + 1, cur);
-
-          cur.pop();
-          cols[j] = 0;
-          rightDiagonal[i + j] = 0;
-          leftDiagonal[i - j + n - 1] = 0;
+      solutions = [];
+      traceLog = [];
+      const algorithmType = document.getElementById('algorithmType').value;
+      const enableLogging = document.getElementById('enableLogging').checked;
+      
+      function addToLog(message) {
+        if (enableLogging) {
+          traceLog.push(message);
         }
       }
 
-      const start = performance.now();
-      placeQueens(0, []);
-      const end = performance.now();
-
-      console.log(`⏱️ Solving ${n}-Queens took ${(end - start).toFixed(2)} ms`);
-      console.log(`Found ${solutions.length} solution(s):`);
-      console.log(solutions);
-
-      return solutions;
+      if (algorithmType === 'naive') {
+        return solveNQueensNaive(n, addToLog);
+      } else {
+        return solveNQueensOptimized(n, addToLog);
+      }
     }
 
+    function solveNQueensNaive(n, addToLog) {
+      const board = Array(n).fill().map(() => Array(n).fill('.'));
+      
+      function isSafe(row, col) {
+        // Check row
+        for (let i = 0; i < col; i++) {
+          if (board[row][i] === 'Q') return false;
+        }
+        
+        // Check upper diagonal
+        for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+          if (board[i][j] === 'Q') return false;
+        }
+        
+        // Check lower diagonal
+        for (let i = row, j = col; i < n && j >= 0; i++, j--) {
+          if (board[i][j] === 'Q') return false;
+        }
+        
+        return true;
+      }
+      
+      function backtrack(col, depth = 0) {
+        if (col === n) {
+          const solution = board.map(row => row.join(''));
+          solutions.push(solution);
+          addToLog(`${'  '.repeat(depth)}✔️ Solution ${solutions.length} found!\n\n`);
+          return;
+        }
+
+        for (let row = 0; row < n; row++) {
+          if (isSafe(row, col)) {
+            board[row][col] = 'Q';
+            addToLog(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
+            backtrack(col + 1, depth + 1);
+            board[row][col] = '.';
+            addToLog(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
+          } else {
+            addToLog(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
+          }
+        }
+      }
+      
+      backtrack(0);
+      return [solutions, traceLog];
+    }
+
+    function solveNQueensOptimized(n, addToLog) {
+      const cols = new Array(n).fill(0);
+      const leftDiagonal = new Array(2 * n - 1).fill(0);
+      const rightDiagonal = new Array(2 * n - 1).fill(0);
+      const board = Array(n).fill().map(() => Array(n).fill('.'));
+      
+      function backtrack(row, depth = 0) {
+        if (row === n) {
+          const solution = board.map(row => row.join(''));
+          solutions.push(solution);
+          addToLog(`${'  '.repeat(depth)}✔️ Solution ${solutions.length} found!\n\n`);
+          return;
+        }
+
+        for (let col = 0; col < n; col++) {
+          const leftDiagIndex = row + col;
+          const rightDiagIndex = row - col + n - 1;
+
+          if (!cols[col] && !leftDiagonal[leftDiagIndex] && !rightDiagonal[rightDiagIndex]) {
+            cols[col] = 1;
+            leftDiagonal[leftDiagIndex] = 1;
+            rightDiagonal[rightDiagIndex] = 1;
+            board[row][col] = 'Q';
+            
+            addToLog(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
+            backtrack(row + 1, depth + 1);
+            
+            cols[col] = 0;
+            leftDiagonal[leftDiagIndex] = 0;
+            rightDiagonal[rightDiagIndex] = 0;
+            board[row][col] = '.';
+            addToLog(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
+          } else {
+            addToLog(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
+          }
+        }
+      }
+      
+      backtrack(0);
+      return [solutions, traceLog];
+    }
 
     function displayBoard(solutionCount) {
       if (solutions == null || solutions.length === 0) {

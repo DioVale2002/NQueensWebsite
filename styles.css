@@ -1,4 +1,3 @@
-
     *{
     font-family: monospace;
     }
@@ -21,11 +20,44 @@
     .controls {
       margin: 20px 0;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .controls label {
       font-size: 20px;
       color: #333;
+    }
+
+    .controls select {
+      font-size: 18px;
+      padding: 8px 12px;
+      margin: 0 5px;
+      border-radius: 5px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+
+    .controls input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    .controls label[for="enableLogging"] {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 15px;
     }
 
     .controls button{
