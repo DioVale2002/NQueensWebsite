@@ -384,10 +384,10 @@
       function isSafe(row, col) {
         const attackedPositions = [];
         
-        // Check row
-        for (let i = 0; i < col; i++) {
-          if (board[row][i] === 'Q') {
-            attackedPositions.push({row, col: i});
+        // Check column
+        for (let i = 0; i < row; i++) {
+          if (board[i][col] === 'Q') {
+            attackedPositions.push({row: i, col});
             return [false, attackedPositions];
           }
         }
@@ -400,8 +400,8 @@
           }
         }
         
-        // Check lower diagonal
-        for (let i = row, j = col; i < n && j >= 0; i++, j--) {
+        // Check other upper diagonal
+        for (let i = row, j = col; i >= 0 && j < n; i--, j++) {
           if (board[i][j] === 'Q') {
             attackedPositions.push({row: i, col: j});
             return [false, attackedPositions];
@@ -411,8 +411,8 @@
         return [true, []];
       }
       
-      function backtrack(col, depth = 0) {
-        if (col === n) {
+      function backtrack(row, depth = 0) {
+        if (row === n) {
           const solution = board.map(row => row.join(''));
           solutions.push(solution);
           addToLog(`${'  '.repeat(depth)}✔️ Solution ${solutions.length} found!\n\n`);
@@ -420,7 +420,7 @@
           return;
         }
 
-        for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
           // First show we're checking this position
           addAnimationStep(`Checking position (${row}, ${col})`, {
             checking: {row, col}
@@ -434,7 +434,7 @@
               placed: {row, col}
             });
             
-            backtrack(col + 1, depth + 1);
+            backtrack(row + 1, depth + 1);
             
             board[row][col] = '.';
             addToLog(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
