@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>N-Queens Algorithms Pseudocode</title>
+    <style>
+        pre {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            white-space: pre;
+            color: #d4d4d4;
+            line-height: 1.4;
+        }
+        .keyword {
+            color: #569cd6;
+            font-weight: bold;
+        }
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+        .function {
+            color: #dcdcaa;
+        }
+        .string {
+            color: #ce9178;
+        }
+        .number {
+            color: #b5cea8;
+        }
+        .operator {
+            color: #d4d4d4;
+        }
+        .array {
+            color: #4ec9b0;
+        }
+        .complexity-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .complexity-table th, .complexity-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .complexity-table th {
+            background-color: #f5f5f5;
+        }
+        .complexity-section {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>N-Queens Algorithms Pseudocode</h1>
+    
+    <h2>Naive Approach</h2>
+    <pre><code><span class="keyword">FUNCTION</span> <span class="function">solveNQueensNaive</span>(n):
+    board = <span class="array">n×n array</span> filled with <span class="string">'.'</span>
+    solutions = <span class="array">[]</span>
+    
+    <span class="keyword">FUNCTION</span> <span class="function">isSafe</span>(row, col):
+        <span class="comment">// Check column above</span>
+        <span class="keyword">FOR</span> i = <span class="number">0</span> <span class="keyword">TO</span> row-<span class="number">1</span>:
+            <span class="keyword">IF</span> board[i][col] <span class="keyword">is</span> <span class="string">'Q'</span>:
+                <span class="keyword">RETURN</span> <span class="keyword">false</span>
+        
+        <span class="comment">// Check upper-left diagonal</span>
+        <span class="keyword">FOR</span> i = row, j = col; i >= <span class="number">0</span> <span class="keyword">AND</span> j >= <span class="number">0</span>; i--, j--:
+            <span class="keyword">IF</span> board[i][j] <span class="keyword">is</span> <span class="string">'Q'</span>:
+                <span class="keyword">RETURN</span> <span class="keyword">false</span>
+        
+        <span class="comment">// Check upper-right diagonal</span>
+        <span class="keyword">FOR</span> i = row, j = col; i >= <span class="number">0</span> <span class="keyword">AND</span> j < n; i++, j++:
+            <span class="keyword">IF</span> board[i][j] <span class="keyword">is</span> <span class="string">'Q'</span>:
+                <span class="keyword">RETURN</span> <span class="keyword">false</span>
+        
+        <span class="keyword">RETURN</span> <span class="keyword">true</span>
+    
+    <span class="keyword">FUNCTION</span> <span class="function">backtrack</span>(row):
+        <span class="keyword">IF</span> row <span class="keyword">equals</span> n:
+            <span class="keyword">ADD</span> copy of current board to solutions
+            <span class="keyword">RETURN</span>
+        
+        <span class="keyword">FOR</span> col = <span class="number">0</span> <span class="keyword">TO</span> n-<span class="number">1</span>:
+            <span class="keyword">IF</span> <span class="function">isSafe</span>(row, col):
+                board[row][col] = <span class="string">'Q'</span>
+                <span class="function">backtrack</span>(row + <span class="number">1</span>)
+                board[row][col] = <span class="string">'.'</span>
+    
+    <span class="function">backtrack</span>(<span class="number">0</span>)
+    <span class="keyword">RETURN</span> solutions</code></pre>
+
+    <h2>Optimized Approach</h2>
+    <pre><code><span class="keyword">FUNCTION</span> <span class="function">solveNQueensOptimized</span>(n):
+    board = <span class="array">n×n array</span> filled with <span class="string">'.'</span>
+    solutions = <span class="array">[]</span>
+    cols = <span class="array">array</span> of size n, filled with <span class="number">0</span>s
+    leftDiag = <span class="array">array</span> of size (2n-1), filled with <span class="number">0</span>s
+    rightDiag = <span class="array">array</span> of size (2n-1), filled with <span class="number">0</span>s
+    
+    <span class="keyword">FUNCTION</span> <span class="function">backtrack</span>(row):
+        <span class="keyword">IF</span> row <span class="keyword">equals</span> n:
+            <span class="keyword">ADD</span> copy of current board to solutions
+            <span class="keyword">RETURN</span>
+        
+        <span class="keyword">FOR</span> col = <span class="number">0</span> <span class="keyword">TO</span> n-<span class="number">1</span>:
+            leftIndex = row + col
+            rightIndex = row - col + n - <span class="number">1</span>
+            
+            <span class="keyword">IF</span> cols[col] <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">AND</span> 
+               leftDiag[leftIndex] <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">AND</span> 
+               rightDiag[rightIndex] <span class="keyword">is</span> <span class="number">0</span>:
+                
+                <span class="comment">// Mark position as attacked</span>
+                cols[col] = <span class="number">1</span>
+                leftDiag[leftIndex] = <span class="number">1</span>
+                rightDiag[rightIndex] = <span class="number">1</span>
+                board[row][col] = <span class="string">'Q'</span>
+                
+                <span class="function">backtrack</span>(row + <span class="number">1</span>)
+                
+                <span class="comment">// Unmark position</span>
+                cols[col] = <span class="number">0</span>
+                leftDiag[leftIndex] = <span class="number">0</span>
+                rightDiag[rightIndex] = <span class="number">0</span>
+                board[row][col] = <span class="string">'.'</span>
+    
+    <span class="function">backtrack</span>(<span class="number">0</span>)
+    <span class="keyword">RETURN</span> solutions</code></pre>
+
+    <div class="complexity-section">
+        <h2>Complexity Analysis</h2>
+        
+        <table class="complexity-table">
+            <tr>
+                <th>Metric</th>
+                <th>Naive Approach</th>
+                <th>Optimized Approach</th>
+            </tr>
+            <tr>
+                <td>Time Complexity</td>
+                <td><span class="math">O(n! × n)</span></td>
+                <td><span class="math">O(n!)</span></td>
+            </tr>
+            <tr>
+                <td>Space Complexity</td>
+                <td><span class="math">O(n²)</span></td>
+                <td><span class="math">O(n²)</span></td>
+            </tr>
+            <tr>
+                <td>Safety Check Cost</td>
+                <td><span class="math">O(n)</span> per check</td>
+                <td><span class="math">O(1)</span> per check</td>
+            </tr>
+            <tr>
+                <td>Additional Space</td>
+                <td>Board only</td>
+                <td>Board + 3 tracking arrays</td>
+            </tr>
+        </table>
+
+        <h3>Detailed Analysis</h3>
+        
+        <h4>Naive Approach:</h4>
+        <ul>
+            <li><strong>Time Complexity:</strong> <span class="math">O(n! × n)</span>
+                <ul>
+                    <li>Base backtracking cost: <span class="math">O(n!)</span> to try all valid queen placements</li>
+                    <li>Safety check cost: <span class="math">O(n)</span> for each placement attempt</li>
+                    <li>Total: <span class="math">O(n!)</span> placements × <span class="math">O(n)</span> per check</li>
+                </ul>
+            </li>
+            <li><strong>Space Complexity:</strong> <span class="math">O(n²)</span>
+                <ul>
+                    <li>Board storage: <span class="math">n × n</span> array</li>
+                    <li>Recursion stack: <span class="math">O(n)</span> depth</li>
+                    <li>No additional tracking structures</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>Optimized Approach:</h4>
+        <ul>
+            <li><strong>Time Complexity:</strong> <span class="math">O(n!)</span>
+                <ul>
+                    <li>Base backtracking cost: <span class="math">O(n!)</span> to try all valid queen placements</li>
+                    <li>Safety check cost: <span class="math">O(1)</span> using hash arrays</li>
+                    <li>Total: <span class="math">O(n!)</span> placements × <span class="math">O(1)</span> per check</li>
+                </ul>
+            </li>
+            <li><strong>Space Complexity:</strong> <span class="math">O(n²)</span>
+                <ul>
+                    <li>Board storage: <span class="math">n × n</span> array</li>
+                    <li>Column array: <span class="math">O(n)</span></li>
+                    <li>Diagonal arrays: <span class="math">O(2n)</span> each</li>
+                    <li>Recursion stack: <span class="math">O(n)</span> depth</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>Key Differences:</h4>
+        <ul>
+            <li>The optimized version trades extra space (<span class="math">O(n)</span> for tracking arrays) for faster safety checks (<span class="math">O(1)</span> vs <span class="math">O(n)</span>)</li>
+            <li>Both use <span class="math">O(n²)</span> space asymptotically, but optimized version has higher constant factor</li>
+            <li>Optimized version is n times faster due to constant-time safety checks</li>
+            <li>For large n, the time difference becomes very significant due to the factorial growth</li>
+        </ul>
+    </div>
+</body>
+</html>

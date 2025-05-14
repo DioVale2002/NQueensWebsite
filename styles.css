@@ -1,466 +1,466 @@
-    *{
+*{
     font-family: monospace;
-    }
-    body {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .header {
-      width: 800px;
-    }
-
-    .header h1 {
-      font-size: 45px;
-      text-align: center;
-      color: #333;
-    }
-    
-    .controls {
-      margin: 20px 0;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .control-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .controls label {
-      font-size: 20px;
-      color: #333;
-    }
-
-    .controls select {
-      font-size: 18px;
-      padding: 8px 12px;
-      margin: 0 5px;
-      border-radius: 5px;
-      background-color: #fff;
-      border: 1px solid #ccc;
-    }
-
-    .controls input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-
-    .controls label[for="enableLogging"] {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-left: 15px;
-    }
-
-    .controls button{
-      background-color: #BA9C9C;
-      font-size: 18px;
-      padding: 8px 12px;
-      margin: 0 5px;
-      border-radius: 5px;
-    }
-
-    .controls button:hover{
-      cursor: pointer;
-      background-color: #8b6363;
-    }
-    
-    .controls input{
-      font-size: 18px;
-      padding: 8px 12px;
-      margin: 2px 5px;
-    }
-
-    .solution-count-div {
-      margin: 0 auto;
-      font-size: 15px;
-      width: 600px;
-      height: 60px;
-      display: none;
-    }
-
-    .solution-count {
-      font-size: 30px;
-      font-weight: bold;
-      color: #3f2424;
-      text-align: center;
-    }
-
-    .board, .animation-board {
-      margin: 0 auto;
-      border: 2px solid #3f2424;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .cell {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-
-    .white {
-      background-color: #f0d9b5;
-    }
-
-    .light-brown {
-      background-color: #b58863;
-    }
-
-    .cell.checking.white,
-    .cell.checking.light-brown {
-      background-color: rgba(255, 224, 163, 0.9) !important;
-    }
-
-    .cell.attack-path.white,
-    .cell.attack-path.light-brown {
-      background-color: rgba(255, 102, 102, 0.3);
-    }
-
-    .cell.highlight-row.white,
-    .cell.highlight-col.white,
-    .cell.highlight-diagonal.white,
-    .cell.highlight-row.light-brown,
-    .cell.highlight-col.light-brown,
-    .cell.highlight-diagonal.light-brown {
-      background-color: rgba(255, 102, 102, 0.3);
-    }
-
-    .cell.attacked.white,
-    .cell.attacked.light-brown {
-      background-color: rgba(255, 128, 128, 0.5);
-    }
-
-    .cell.placed.white,
-    .cell.placed.light-brown {
-      background-color: rgba(144, 238, 144, 0.5);
-    }
-
-    .queen {
-      width: 80%;
-      height: 80%;
-      object-fit: contain;
-      pointer-events: none;
-      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
-    }
-
-    .solution-number-div{
-      margin: 0 auto;
-      width: 604px;
-      height: 60px;
-      display: none;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .solution-number{
-      font-size: 30px;
-      font-weight: bold;
-      text-align: start;
-      color: #3f2424;
-      width: 185px;
-    }
-
-    .btns{
-      background-color: #BA9C9C;
-      display: none
-    }
-
-    #showTrackLog{
-      font-size: 18px;
-      width: 150px;
-      height: 50px;
-    }
-
-    .btns:hover{
-      cursor: pointer;
-      background-color: #6d5656;
-    }
-
-    .btnImg{  
-      width: 30px;
-      height: 30px;
-      margin: 5px 4px;
-    }
-
-    .explanation {
-      text-align: left;
-      margin-top: 20px;
-    }
-
-    .explanation h2 {
-      font-size: 24px;
-      color: #333;
-    }
-
-    .explanation p {
-      font-size: 18px;
-      text-align: justify;
-      color: #555;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      padding-top: 10%;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-
-    .modal-content {
-      background-color: #fff;
-      margin: auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 20%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      animation: fadeIn 0.3s;
-    }
-
-    .modal-content h2{
-      font-size: 20px;
-    }
-    #traceParagraph{
-      white-space: pre-line;
-      font-size: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .close:hover {
-      color: #000;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0}
-      to {opacity: 1}
-    }
-
+}
 body {
-  font-family: monospace;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-h1 {
-  color: #333;
-  text-align: center;
+.header {
+    width: 800px;
+}
+
+.header h1 {
+    font-size: 45px;
+    text-align: center;
+    color: #333;
 }
 
 .controls {
-  margin: 20px 0;
-  text-align: center;
+    margin: 20px 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-input, button {
-  padding: 8px 12px;
-  margin: 0 5px;
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#output {
-  white-space: pre;
-  background-color: #f5f5f5;
-  padding: 15px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-  margin-top: 20px;
-  text-align: left;
-  min-height: 200px;
+.controls label {
+    font-size: 20px;
+    color: #333;
 }
 
-.explanation {
-  text-align: left;
-  margin-top: 20px;
+.controls select {
+    font-size: 18px;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.controls input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.controls label[for="enableLogging"] {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px;
+}
+
+.controls button{
+    background-color: #BA9C9C;
+    font-size: 18px;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 5px;
+}
+
+.controls button:hover{
+    cursor: pointer;
+    background-color: #8b6363;
+}
+
+.controls input{
+    font-size: 18px;
+    padding: 8px 12px;
+    margin: 2px 5px;
 }
 
 .solution-count-div {
-  margin: 0 auto 30px auto;
-  font-size: 15px;
-  width: 600px;
-  height: 60px;
-  display: none;
-  position: relative;
-  z-index: 10;        
-  background-color: rgba(255, 255, 255, 0.9); 
+    margin: 0 auto;
+    font-size: 15px;
+    width: 600px;
+    height: 60px;
+    display: none;
+}
+
+.solution-count {
+    font-size: 30px;
+    font-weight: bold;
+    color: #3f2424;
+    text-align: center;
+}
+
+.board, .animation-board {
+    margin: 0 auto;
+    border: 2px solid #3f2424;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.white {
+    background-color: #f0d9b5;
+}
+
+.light-brown {
+    background-color: #b58863;
+}
+
+.cell.checking.white,
+.cell.checking.light-brown {
+    background-color: rgba(255, 224, 163, 0.9) !important;
+}
+
+.cell.attack-path.white,
+.cell.attack-path.light-brown {
+    background-color: rgba(255, 102, 102, 0.3);
+}
+
+.cell.highlight-row.white,
+.cell.highlight-col.white,
+.cell.highlight-diagonal.white,
+.cell.highlight-row.light-brown,
+.cell.highlight-col.light-brown,
+.cell.highlight-diagonal.light-brown {
+    background-color: rgba(255, 102, 102, 0.3);
+}
+
+.cell.attacked.white,
+.cell.attacked.light-brown {
+    background-color: rgba(255, 128, 128, 0.5);
+}
+
+.cell.placed.white,
+.cell.placed.light-brown {
+    background-color: rgba(144, 238, 144, 0.5);
+}
+
+.queen {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.solution-number-div{
+    margin: 0 auto;
+    width: 604px;
+    height: 60px;
+    display: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.solution-number{
+    font-size: 30px;
+    font-weight: bold;
+    text-align: start;
+    color: #3f2424;
+    width: 185px;
+}
+
+.btns{
+    background-color: #BA9C9C;
+    display: none;
+}
+
+#showTrackLog{
+    font-size: 18px;
+    width: 150px;
+    height: 50px;
+}
+
+.btns:hover{
+    cursor: pointer;
+    background-color: #6d5656;
+}
+
+.btnImg{  
+    width: 30px;
+    height: 30px;
+    margin: 5px 4px;
+}
+
+.explanation {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.explanation h2 {
+    font-size: 24px;
+    color: #333;
+}
+
+.explanation p {
+    font-size: 18px;
+    text-align: justify;
+    color: #555;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    padding-top: 10%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 20%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s;
+}
+
+.modal-content h2{
+    font-size: 20px;
+}
+#traceParagraph{
+    white-space: pre-line;
+    font-size: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+body {
+    font-family: monospace;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+.controls {
+    margin: 20px 0;
+    text-align: center;
+}
+
+input, button {
+    padding: 8px 12px;
+    margin: 0 5px;
+}
+
+#output {
+    white-space: pre;
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-top: 20px;
+    text-align: left;
+    min-height: 200px;
+}
+
+.explanation {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.solution-count-div {
+    margin: 0 auto 30px auto;
+    font-size: 15px;
+    width: 600px;
+    height: 60px;
+    display: none;
+    position: relative;
+    z-index: 10;        
+    background-color: rgba(255, 255, 255, 0.9); 
 }
 
 .animation-container {
-  margin: 40px auto;
-  width: 800px;
-  text-align: center;
+    margin: 40px auto;
+    width: 800px;
+    text-align: center;
 }
 
 .animation-container h2 {
-  font-size: 24px;
-  color: #3f2424;
-  margin-bottom: 20px;
-  font-weight: 500;
+    font-size: 24px;
+    color: #3f2424;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .animation-board {
-  width: 400px;
-  height: 400px;
-  display: grid;
+    width: 400px;
+    height: 400px;
+    display: grid;
 }
 
 .animation-controls {
-  margin: 20px auto;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  align-items: center;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
 }
 
 .control-btn {
-  background-color: #b58863;
-  color: white;
-  font-size: 16px;
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 50px;
-  height: 40px;
-  transition: background-color 0.2s ease;
+    background-color: #b58863;
+    color: white;
+    font-size: 16px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 40px;
+    transition: background-color 0.2s ease;
 }
 
 .control-btn:hover {
-  background-color: #8b6363;
+    background-color: #8b6363;
 }
 
 .control-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
 .animation-info {
-  margin: 20px auto;
-  max-width: 600px;
+    margin: 20px auto;
+    max-width: 600px;
 }
 
 #stepDescription {
-  font-size: 16px;
-  color: #3f2424;
-  margin-bottom: 10px;
-  min-height: 40px;
-  font-weight: 500;
+    font-size: 16px;
+    color: #3f2424;
+    margin-bottom: 10px;
+    min-height: 40px;
+    font-weight: 500;
 }
 
 #stepCounter {
-  font-size: 14px;
-  color: #666;
+    font-size: 14px;
+    color: #666;
 }
 
 .legend-container {
-  margin: 20px auto;
-  padding: 15px;
-  border-radius: 5px;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  max-width: 600px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    max-width: 600px;
 }
 
 .legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #3f2424;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #3f2424;
 }
 
 .legend-color {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .legend-checking {
-  background-color: rgba(255, 224, 163, 0.9);
+    background-color: rgba(255, 224, 163, 0.9);
 }
 
 .legend-attack {
-  background-color: rgba(255, 102, 102, 0.3);
+    background-color: rgba(255, 102, 102, 0.3);
 }
 
 .legend-placed {
-  background-color: rgba(144, 238, 144, 0.5);
+    background-color: rgba(144, 238, 144, 0.5);
 }
 
 .legend-attacked {
-  background-color: rgba(255, 128, 128, 0.5);
+    background-color: rgba(255, 128, 128, 0.5);
 }
 
 .code-display {
-  margin: 20px auto;
-  max-width: 600px;
-  background-color: #1e1e1e;
-  border-radius: 5px;
-  padding: 15px;
-  font-family: 'Consolas', monospace;
-  color: #d4d4d4;
-  position: relative;
-  overflow-x: auto;
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #1e1e1e;
+    border-radius: 5px;
+    padding: 15px;
+    font-family: 'Consolas', monospace;
+    color: #d4d4d4;
+    position: relative;
+    overflow-x: auto;
 }
 
 .code-line {
-  padding: 2px 0;
-  display: flex;
-  gap: 10px;
+    padding: 2px 0;
+    display: flex;
+    gap: 10px;
 }
 
 .line-number {
-  color: #858585;
-  user-select: none;
-  min-width: 30px;
-  text-align: right;
+    color: #858585;
+    user-select: none;
+    min-width: 30px;
+    text-align: right;
 }
 
 .code-content {
-  flex: 1;
+    flex: 1;
 }
 
 .code-highlight {
-  background-color: rgba(255, 224, 163, 0.2);
+    background-color: rgba(255, 224, 163, 0.2);
 }
 
 .code-comment {
-  color: #6a9955;
+    color: #6a9955;
 }
 
 

@@ -24,10 +24,6 @@
         <option value="naive">Naive Approach</option>
         <option value="optimized">Optimized Approach</option>
       </select>
-      <label for="enableLogging">
-        <input type="checkbox" id="enableLogging" checked>
-        Enable Logging
-      </label>
     </div>
     <div class="control-row">
       <button id="solveButton">Solve</button>
@@ -41,49 +37,8 @@
   <div class="board" id="chessboard"></div>
   <div class="solution-number-div" id="solution-number-div">
     <h1 class="solution-number" id="solution-number"></h1>
-    <button class="btns" id="showTrackLog">Show TrackLog</button>
     <button class="btns" id="prevSolution"><img src="prev_button.png" alt="prevButton" class="btnImg"></button>
     <button class="btns" id="nextSolution"><img src="next_button.png" alt="nextButton" class="btnImg"></button>
-  </div>
-
-  <div class="animation-container">
-    <h2>Algorithm Visualization</h2>
-    <div class="legend-container">
-      <div class="legend-item">
-        <div class="legend-color legend-checking"></div>
-        <span>Current Position</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color legend-attack"></div>
-        <span>Attack Path</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color legend-placed"></div>
-        <span>Queen Placed</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color legend-attacked"></div>
-        <span>Position Attacked</span>
-      </div>
-    </div>
-    <div class="animation-board" id="animationBoard"></div>
-    <div class="animation-controls">
-      <button class="control-btn" id="stepBackward"><img src="prev_button.png" alt="Step Back" class="btnImg"></button>
-      <button class="control-btn" id="playPause">Play</button>
-      <button class="control-btn" id="stepForward"><img src="next_button.png" alt="Step Forward" class="btnImg"></button>
-    </div>
-    <div class="animation-info">
-      <p id="stepDescription">Click Play to start the animation</p>
-      <p id="stepCounter">Step: 0 / 0</p>
-    </div>
-  </div>
-
-  <div id="trackLogModal" class="modal">
-    <div class="modal-content">
-      <span id="closeModalBtn" class="close">&times;</span>
-      <h2>Trace Log</h2>
-      <p id="traceParagraph"></p>
-    </div>
   </div>
 
   <div class="explanation">
@@ -93,9 +48,6 @@
   </div>
 
   <script>
-    const traceLogModal = document.getElementById('trackLogModal');
-    const openTraceLog = document.getElementById('showTrackLog');
-    const closeTraceLog = document.getElementById('closeModalBtn');
     const boardDiv = document.getElementById('chessboard');
     const solutionCurrentNumberDiv = document.getElementById('solution-number-div');
     const prevButton = document.getElementById('prevSolution');
@@ -103,185 +55,9 @@
     const solutionCountDiv = document.getElementById('solution-count-div');
 
     let solutions = [];
-    let traceLog = [];
     let solutionCount;
-    let animationSteps = [];
-    let currentStepIndex = -1;
-    let isPlaying = false;
-    let animationInterval;
-    const ANIMATION_SPEED = 500; // milliseconds between steps
-
-    // Animation control elements
-    const playPauseBtn = document.getElementById('playPause');
-    const stepBackwardBtn = document.getElementById('stepBackward');
-    const stepForwardBtn = document.getElementById('stepForward');
-    const stepDescription = document.getElementById('stepDescription');
-    const stepCounter = document.getElementById('stepCounter');
-    const animationBoard = document.getElementById('animationBoard');
-
-    function createAnimationBoard(n) {
-      animationBoard.innerHTML = '';
-      animationBoard.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
-      animationBoard.style.gridTemplateRows = `repeat(${n}, 1fr)`;
-
-      for (let row = 0; row < n; row++) {
-        for (let col = 0; col < n; col++) {
-          const cell = document.createElement('div');
-          cell.classList.add('cell');
-          cell.classList.add((row + col) % 2 === 0 ? 'white' : 'light-brown');
-          animationBoard.appendChild(cell);
-        }
-      }
-    }
-
-    function updateAnimationBoard(board, highlights = {}) {
-      const cells = animationBoard.children;
-      const n = board.length;
-      
-      // Clear all highlights first
-      for (let i = 0; i < cells.length; i++) {
-        cells[i].classList.remove('checking', 'attacked', 'placed', 'highlight-row', 'highlight-col', 'highlight-diagonal', 'attack-path');
-        cells[i].innerHTML = '';
-      }
-      
-      // Add queens and basic board state
-      for (let row = 0; row < n; row++) {
-        for (let col = 0; col < n; col++) {
-          const cell = cells[row * n + col];
-          
-          if (board[row][col] === 'Q') {
-            const queen = document.createElement('img');
-            queen.src = 'queen_Image.png';
-            queen.alt = 'queen';
-            queen.classList.add('queen');
-            cell.appendChild(queen);
-          }
-        }
-      }
-
-      // Show attack paths from existing queens first (lowest priority)
-      for (let r = 0; r < n; r++) {
-        for (let c = 0; c < n; c++) {
-          if (board[r][c] === 'Q') {
-            // Mark queen's attack paths
-            for (let i = 0; i < n; i++) {
-              // Row and column
-              if (i !== c) cells[r * n + i].classList.add('attack-path');
-              if (i !== r) cells[i * n + c].classList.add('attack-path');
-              
-              // Diagonals
-              for (let j = 0; j < n; j++) {
-                if ((i + j === r + c || i - j === r - c) && board[i][j] !== 'Q') {
-                  cells[i * n + j].classList.add('attack-path');
-                }
-              }
-            }
-          }
-        }
-      }
-
-      // Add checking highlight first (it should be visible regardless of other states)
-      if (highlights.checking) {
-        const { row, col } = highlights.checking;
-        cells[row * n + col].classList.add('checking');
-      }
-
-      // Add highlights for current position being checked
-      if (highlights.checking) {
-        const { row, col } = highlights.checking;
-        
-        // Highlight attack paths from current position
-        // Row
-        for (let c = 0; c < n; c++) {
-          if (c !== col) cells[row * n + c].classList.add('highlight-row');
-        }
-        
-        // Column
-        for (let r = 0; r < n; r++) {
-          if (r !== row) cells[r * n + col].classList.add('highlight-col');
-        }
-        
-        // Diagonals
-        for (let i = 0; i < n; i++) {
-          for (let j = 0; j < n; j++) {
-            if ((i + j === row + col || i - j === row - col) && !(i === row && j === col)) {
-              cells[i * n + j].classList.add('highlight-diagonal');
-            }
-          }
-        }
-      }
-
-      // Show attacked positions (higher priority)
-      if (highlights.attacked) {
-        highlights.attacked.forEach(({row, col}) => {
-          cells[row * n + col].classList.add('attacked');
-        });
-      }
-
-      // Show placed queen (higher priority)
-      if (highlights.placed) {
-        const { row, col } = highlights.placed;
-        cells[row * n + col].classList.add('placed');
-      }
-    }
-
-    function playAnimation() {
-      if (currentStepIndex >= animationSteps.length - 1) {
-        stopAnimation();
-        return;
-      }
-
-      currentStepIndex++;
-      updateAnimationStep();
-    }
-
-    function updateAnimationStep() {
-      if (currentStepIndex < 0 || currentStepIndex >= animationSteps.length) return;
-
-      const step = animationSteps[currentStepIndex];
-      updateAnimationBoard(step.board, step.highlights);
-      stepDescription.textContent = step.description;
-      stepCounter.textContent = `Step: ${currentStepIndex + 1} / ${animationSteps.length}`;
-      
-      stepBackwardBtn.disabled = currentStepIndex <= 0;
-      stepForwardBtn.disabled = currentStepIndex >= animationSteps.length - 1;
-    }
-
-    function stopAnimation() {
-      isPlaying = false;
-      clearInterval(animationInterval);
-      playPauseBtn.textContent = 'Play';
-    }
-
-    playPauseBtn.addEventListener('click', () => {
-      if (isPlaying) {
-        stopAnimation();
-      } else {
-        isPlaying = true;
-        playPauseBtn.textContent = 'Pause';
-        animationInterval = setInterval(playAnimation, ANIMATION_SPEED);
-      }
-    });
-
-    stepBackwardBtn.addEventListener('click', () => {
-      stopAnimation();
-      if (currentStepIndex > 0) {
-        currentStepIndex--;
-        updateAnimationStep();
-      }
-    });
-
-    stepForwardBtn.addEventListener('click', () => {
-      stopAnimation();
-      if (currentStepIndex < animationSteps.length - 1) {
-        currentStepIndex++;
-        updateAnimationStep();
-      }
-    });
 
     document.getElementById('solveButton').addEventListener('click', () => {
-      document.getElementById("traceParagraph").innerText = "";
-      solutionTraceCounter = 0;
       const n = parseInt(document.getElementById('boardSize').value);
       if (n < 1 || n > 12) {
         alert('Please enter a board size between 1 and 12');
@@ -289,16 +65,9 @@
       }
 
       solutionCount = 0;
-      animationSteps = [];
-      currentStepIndex = -1;
-      stopAnimation();
-
-      createAnimationBoard(n);
       
       const startTime = performance.now();
-      const result = solveNQueens(n);
-      solutions = result[0];
-      traceLog = result[1];
+      solutions = solveNQueens(n);
       const endTime = performance.now();
       const runTime = (endTime - startTime).toFixed(2);
 
@@ -307,12 +76,6 @@
       solutionCountDiv.style.display = 'block';
 
       displayBoard(solutionCount);
-      
-      // Start animation from beginning
-      if (animationSteps.length > 0) {
-        currentStepIndex = 0;
-        updateAnimationStep();
-      }
     });
 
     document.getElementById('prevSolution').addEventListener('click', () => {
@@ -329,153 +92,77 @@
       }
     });
 
-    openTraceLog.addEventListener('click', () => {
-      traceLogModal.style.display = 'block';
-      const traceParagraph = document.getElementById('traceParagraph');
-      traceParagraph.textContent = '';
-      
-      if (!document.getElementById('enableLogging').checked) {
-        traceParagraph.textContent = 'Logging is disabled. Enable logging to see the solution trace.';
-      } else {
-        traceParagraph.textContent = traceLog.join('');
-      }
-    });
-
-    closeTraceLog.addEventListener('click', () => {
-      traceLogModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (event) => {
-      if (event.target === traceLogModal) {
-        traceLogModal.style.display = 'none';
-      }
-    });
-
     function solveNQueens(n) {
       solutions = [];
-      traceLog = [];
       const algorithmType = document.getElementById('algorithmType').value;
-      const enableLogging = document.getElementById('enableLogging').checked;
       
-      function addToLog(message) {
-        if (enableLogging) {
-          traceLog.push(message);
-        }
-      }
-
       if (algorithmType === 'naive') {
-        return solveNQueensNaive(n, addToLog);
+        return solveNQueensNaive(n);
       } else {
-        return solveNQueensOptimized(n, addToLog);
+        return solveNQueensOptimized(n);
       }
     }
 
-    function solveNQueensNaive(n, addToLog) {
+    function solveNQueensNaive(n) {
       const board = Array(n).fill().map(() => Array(n).fill('.'));
+      const results = [];
       
-      function addAnimationStep(description, highlights = {}) {
-        animationSteps.push({
-          board: board.map(row => [...row]),
-          description: description,
-          highlights: highlights
-        });
-      }
-
       function isSafe(row, col) {
-        const attackedPositions = [];
-        
         // Check column
         for (let i = 0; i < row; i++) {
           if (board[i][col] === 'Q') {
-            attackedPositions.push({row: i, col});
-            return [false, attackedPositions];
+            return false;
           }
         }
         
         // Check upper diagonal
         for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
           if (board[i][j] === 'Q') {
-            attackedPositions.push({row: i, col: j});
-            return [false, attackedPositions];
+            return false;
           }
         }
         
         // Check other upper diagonal
         for (let i = row, j = col; i >= 0 && j < n; i--, j++) {
           if (board[i][j] === 'Q') {
-            attackedPositions.push({row: i, col: j});
-            return [false, attackedPositions];
+            return false;
           }
         }
         
-        return [true, []];
+        return true;
       }
       
-      function backtrack(row, depth = 0) {
+      function backtrack(row) {
         if (row === n) {
           const solution = board.map(row => row.join(''));
-          solutions.push(solution);
-          addToLog(`${'  '.repeat(depth)}✔️ Solution ${solutions.length} found!\n\n`);
-          addAnimationStep(`Solution ${solutions.length} found!`);
+          results.push(solution);
           return;
         }
 
         for (let col = 0; col < n; col++) {
-          // First show we're checking this position
-          addAnimationStep(`Checking position (${row}, ${col})`, {
-            checking: {row, col}
-          });
-          
-          const [safe, attackingQueens] = isSafe(row, col);
-          if (safe) {
+          if (isSafe(row, col)) {
             board[row][col] = 'Q';
-            addToLog(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
-            addAnimationStep(`Placed queen at (${row}, ${col})`, {
-              placed: {row, col}
-            });
-            
-            backtrack(row + 1, depth + 1);
-            
+            backtrack(row + 1);
             board[row][col] = '.';
-            addToLog(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
-            addAnimationStep(`Backtracked from (${row}, ${col})`, {
-              checking: {row, col}
-            });
-          } else {
-            addToLog(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
-            addAnimationStep(`Position (${row}, ${col}) is under attack`, {
-              checking: {row, col},
-              attacked: attackingQueens
-            });
           }
         }
       }
       
-      addAnimationStep('Starting naive algorithm...');
       backtrack(0);
-      return [solutions, traceLog];
+      return results;
     }
 
-    function solveNQueensOptimized(n, addToLog) {
+    function solveNQueensOptimized(n) {
       const cols = new Array(n).fill(0);
       const leftDiagonal = new Array(2 * n - 1).fill(0);
       const rightDiagonal = new Array(2 * n - 1).fill(0);
       const board = Array(n).fill().map(() => Array(n).fill('.'));
+      const results = [];
       
-      function addAnimationStep(description, highlights = {}) {
-        animationSteps.push({
-          board: board.map(row => [...row]),
-          description: description,
-          highlights: highlights
-        });
-      }
-
-      function backtrack(row, depth = 0) {
+      function backtrack(row) {
         if (row === n) {
           const solution = board.map(row => row.join(''));
-          solutions.push(solution);
-          addToLog(`${'  '.repeat(depth)}✔️ Solution ${solutions.length} found!\n\n`);
-          addAnimationStep(`Solution ${solutions.length} found!`);
+          results.push(solution);
           return;
         }
 
@@ -483,45 +170,24 @@
           const leftDiagIndex = row + col;
           const rightDiagIndex = row - col + n - 1;
 
-          // First show we're checking this position
-          addAnimationStep(`Checking position (${row}, ${col})`, {
-            checking: {row, col}
-          });
-
           if (!cols[col] && !leftDiagonal[leftDiagIndex] && !rightDiagonal[rightDiagIndex]) {
             cols[col] = 1;
             leftDiagonal[leftDiagIndex] = 1;
             rightDiagonal[rightDiagIndex] = 1;
             board[row][col] = 'Q';
             
-            addToLog(`${'  '.repeat(depth)}✅ Placed Q at (${row}, ${col})\n`);
-            addAnimationStep(`Placed queen at (${row}, ${col})`, {
-              placed: {row, col}
-            });
-            
-            backtrack(row + 1, depth + 1);
+            backtrack(row + 1);
             
             cols[col] = 0;
             leftDiagonal[leftDiagIndex] = 0;
             rightDiagonal[rightDiagIndex] = 0;
             board[row][col] = '.';
-            addToLog(`${'  '.repeat(depth)}↩️ Backtracked from (${row}, ${col})\n`);
-            addAnimationStep(`Backtracked from (${row}, ${col})`, {
-              checking: {row, col}
-            });
-          } else {
-            addToLog(`${'  '.repeat(depth)}❌ Cannot place Q at (${row}, ${col})\n`);
-            addAnimationStep(`Position (${row}, ${col}) is under attack`, {
-              checking: {row, col},
-              attacked: [{row, col}]
-            });
           }
         }
       }
       
-      addAnimationStep('Starting optimized algorithm...');
       backtrack(0);
-      return [solutions, traceLog];
+      return results;
     }
 
     function displayBoard(solutionCount) {
@@ -576,7 +242,6 @@
 
     function showElements() {
       solutionCountDiv.style.display = 'block';
-      openTraceLog.style.display = 'block';
       boardDiv.style.display = 'grid';
       solutionCurrentNumberDiv.style.display = 'flex';
       prevButton.style.visibility = 'visible';
@@ -589,7 +254,6 @@
       boardDiv.style.display = 'none';
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
-      openTraceLog.style.display = 'none';
       solutionCurrentNumberDiv.style.display = 'none';
     }
 
