@@ -94,36 +94,67 @@
       text-align: center;
     }
 
-    .board {
+    .board, .animation-board {
       margin: 0 auto;
-      width: 600px;
-      height: 600px;
-      display: none;
-      border: 2px solid black;
+      border: 2px solid #3f2424;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     
     .cell {
+      position: relative;
       width: 100%;
       height: 100%;
       aspect-ratio: 1 / 1;
       display: flex;
       justify-content: center;
       align-items: center;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
     .white {
-      background-color: #FFFFFF;
+      background-color: #f0d9b5;
     }
 
     .light-brown {
-      background-color: #BA9C9C;
+      background-color: #b58863;
+    }
+
+    .cell.checking.white,
+    .cell.checking.light-brown {
+      background-color: rgba(255, 224, 163, 0.9) !important;
+    }
+
+    .cell.attack-path.white,
+    .cell.attack-path.light-brown {
+      background-color: rgba(255, 102, 102, 0.3);
+    }
+
+    .cell.highlight-row.white,
+    .cell.highlight-col.white,
+    .cell.highlight-diagonal.white,
+    .cell.highlight-row.light-brown,
+    .cell.highlight-col.light-brown,
+    .cell.highlight-diagonal.light-brown {
+      background-color: rgba(255, 102, 102, 0.3);
+    }
+
+    .cell.attacked.white,
+    .cell.attacked.light-brown {
+      background-color: rgba(255, 128, 128, 0.5);
+    }
+
+    .cell.placed.white,
+    .cell.placed.light-brown {
+      background-color: rgba(144, 238, 144, 0.5);
     }
 
     .queen {
-      width: 90%;
-      height: 90%;
+      width: 80%;
+      height: 80%;
       object-fit: contain;
       pointer-events: none;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
     }
 
     .solution-number-div{
@@ -279,6 +310,157 @@ input, button {
   position: relative;
   z-index: 10;        
   background-color: rgba(255, 255, 255, 0.9); 
+}
+
+.animation-container {
+  margin: 40px auto;
+  width: 800px;
+  text-align: center;
+}
+
+.animation-container h2 {
+  font-size: 24px;
+  color: #3f2424;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.animation-board {
+  width: 400px;
+  height: 400px;
+  display: grid;
+}
+
+.animation-controls {
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  align-items: center;
+}
+
+.control-btn {
+  background-color: #b58863;
+  color: white;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  height: 40px;
+  transition: background-color 0.2s ease;
+}
+
+.control-btn:hover {
+  background-color: #8b6363;
+}
+
+.control-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.animation-info {
+  margin: 20px auto;
+  max-width: 600px;
+}
+
+#stepDescription {
+  font-size: 16px;
+  color: #3f2424;
+  margin-bottom: 10px;
+  min-height: 40px;
+  font-weight: 500;
+}
+
+#stepCounter {
+  font-size: 14px;
+  color: #666;
+}
+
+.legend-container {
+  margin: 20px auto;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #3f2424;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.legend-checking {
+  background-color: rgba(255, 224, 163, 0.9);
+}
+
+.legend-attack {
+  background-color: rgba(255, 102, 102, 0.3);
+}
+
+.legend-placed {
+  background-color: rgba(144, 238, 144, 0.5);
+}
+
+.legend-attacked {
+  background-color: rgba(255, 128, 128, 0.5);
+}
+
+.code-display {
+  margin: 20px auto;
+  max-width: 600px;
+  background-color: #1e1e1e;
+  border-radius: 5px;
+  padding: 15px;
+  font-family: 'Consolas', monospace;
+  color: #d4d4d4;
+  position: relative;
+  overflow-x: auto;
+}
+
+.code-line {
+  padding: 2px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.line-number {
+  color: #858585;
+  user-select: none;
+  min-width: 30px;
+  text-align: right;
+}
+
+.code-content {
+  flex: 1;
+}
+
+.code-highlight {
+  background-color: rgba(255, 224, 163, 0.2);
+}
+
+.code-comment {
+  color: #6a9955;
 }
 
 
